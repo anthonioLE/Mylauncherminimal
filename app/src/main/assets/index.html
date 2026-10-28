@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #090b0f;
+  --panel: #15181e;
+  --text: #f2f4f7;
+  --muted: #858c98;
+  --line: #282d35;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Roboto, "Segoe UI", sans-serif;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  padding: 4.5vh 5vw;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 15vh;
+}
+.time {
+  font-size: 5vw;
+  font-weight: 300;
+  letter-spacing: -.06em;
+}
+.date {
+  margin-top: 1vh;
+  font-size: 1.25vw;
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 3vw;
+}
+.weather {
+  text-align: right;
+}
+.temperature {
+  font-size: 2.1vw;
+  font-weight: 400;
+}
+.city {
+  color: var(--muted);
+  font-size: 1vw;
+  margin-top: .6vh;
+}
+button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.settings {
+  width: 3.8vw;
+  height: 3.8vw;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--panel);
+  outline: none;
+}
+.settings svg {
+  width: 1.7vw;
+  height: 1.7vw;
+  fill: none;
+  stroke: #cbd0d8;
+  stroke-width: 1.5;
+}
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 4vh;
+}
+.section-title {
+  color: #717987;
+  font-size: 1vw;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  margin-bottom: 3vh;
+}
+.apps {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5vw;
+  flex-wrap: wrap;
+}
+.app {
+  width: 8vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4vh;
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+.tile {
+  width: 4.8vw;
+  height: 4.8vw;
+  display: grid;
+  place-items: center;
+  border: 1px solid #292e37;
+  border-radius: 1.1vw;
+  background: #14171d;
+  box-shadow: 0 0 0 rgba(255,255,255,0);
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.tile svg {
+  width: 2vw;
+  height: 2vw;
+  fill: none;
+  stroke: #d8dde6;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.label {
+  color: #aab0ba;
+  font-size: 1.05vw;
+  text-align: center;
+  white-space: nowrap;
+}
+.app:focus .tile, .settings:focus {
+  border-color: #b9c6dc;
+  box-shadow: 0 0 1.2vw rgba(174,196,232,.14);
+  transform: scale(1.06);
+}
+.app:focus .label {
+  color: #fff;
+}
+footer {
+  height: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #505865;
+  font-size: .9vw;
+}
+#all {
+  display: none;
+  position: fixed;
+  inset: 0;
+  padding: 7vh 5vw;
+  background: #090b0f;
+}
+#all.open { display: block; }
+#all h2 {
+  font-size: 2vw;
+  font-weight: 400;
+  margin-bottom: 4vh;
+}
+#allapps {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4vh;
+}
+@media (max-aspect-ratio: 4/3) {
+  .time { font-size: 7vw; }
+  .tile { width: 7vw; height: 7vw; }
+  .tile svg { width: 3vw; height: 3vw; }
+  .app { width: 12vw; }
+  .label { font-size: 1.7vw; }
+  .date, .section-title, .city, footer { font-size: 1.5vw; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="time" id="clock">--:--</div>
+    <div class="date" id="date">Cargando fecha</div>
+  </div>
+  <div class="right">
+    <div class="weather">
+      <div class="temperature" id="temp">--°</div>
+      <div class="city" id="city">LEÓN, GTO.</div>
+    </div>
+    <button class="settings" id="settings" aria-label="Ajustes" title="Ajustes">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-1.8 1.8-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V20h-2.6v-.08a1.8 1.8 0 0 0-1.1-1.65 1.8 1.8 0 0 0-2 .36l-.06.06-1.8-1.8.06-.06a1.8 1.8 0 0 0 .36-2 1.8 1.8 0 0 0-1.65-1.1H6v-2.6h.08a1.8 1.8 0 0 0 1.65-1.1 1.8 1.8 0 0 0-.36-2l-.06-.06 1.8-1.8.06.06a1.8 1.8 0 0 0 2 .36 1.8 1.8 0 0 0 1.1-1.65V4h2.6v.08a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 2-.36l.06-.06 1.8 1.8-.06.06a1.8 1.8 0 0 0-.36 2 1.8 1.8 0 0 0 1.65 1.1H21v2.6h-.08A1.8 1.8 0 0 0 19.4 15z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="section-title">Aplicaciones</div>
+  <div class="apps" id="apps">
+    <button class="app" data-action="all">
+      <span class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span>
+      <span class="label">Todas las apps</span>
+    </button>
+  </div>
+</main>
+
+<footer>
+  <span>MI LAUNCHER</span>
+  <span>Usa las flechas para navegar · OK para abrir</span>
+</footer>
+
+<section id="all">
+  <h2>Todas las aplicaciones</h2>
+  <div class="apps" id="allapps"></div>
+</section>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var allOpen = false;
+
+  function updateClock() {
+    var d = new Date();
+    $('clock').textContent = d.toLocaleTimeString('es-MX', {
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    $('date').textContent = d.toLocaleDateString('es-MX', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    }).toUpperCase();
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  function loadWeather() {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=21.1221&longitude=-101.6824&current=temperature_2m')
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j.current) $('temp').textContent = Math.round(j.current.temperature_2m) + '°C';
+      }).catch(function () {});
+  }
+  loadWeather();
+  setInterval(loadWeather, 1800000);
+
+  function iconFor(label) {
+    var name = (label || '').toLowerCase();
+    if (name.includes('youtube')) return '<rect x="3" y="6" width="18" height="12" rx="3"/><path d="m10 9 5 3-5 3z"/>';
+    if (name.includes('netflix')) return '<path d="M6 4v16l5-8 2-3 5-5v16M6 4l12 16"/>';
+    if (name.includes('ajuste') || name.includes('setting')) return '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/>';
+    return '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 12h6M12 9v6"/>';
+  }
+
+  function makeApp(app) {
+    var b = document.createElement('button');
+    b.className = 'app';
+    b.dataset.pkg = app.pkg || '';
+    b.innerHTML = '<span class="tile"><svg viewBox="0 0 24 24">' +
+      iconFor(app.label) + '</svg></span><span class="label"></span>';
+    b.querySelector('.label').textContent = app.label || 'Aplicación';
+    b.addEventListener('click', function () {
+      if (app.pkg && window.Android) window.Android.launch(app.pkg);
+    });
+    return b;
+  }
+
+  function refreshApps() {
+    if (!window.Android || !window.Android.getApps) return;
+    try {
+      var list = JSON.parse(window.Android.getApps() || '[]');
+      var home = $('apps');
+      var all = $('allapps');
+      home.innerHTML = '';
+      all.innerHTML = '';
+
+      var show = list.slice(0, 8);
+      show.forEach(function (app) { home.appendChild(makeApp(app)); });
+      list.forEach(function (app) { all.appendChild(makeApp(app)); });
+
+      var more = document.createElement('button');
+      more.className = 'app';
+      more.dataset.action = 'all';
+      more.innerHTML = '<span class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><span class="label">Todas las apps</span>';
+      home.appendChild(more);
+      more.addEventListener('click', openAll);
+      home.querySelector('.app')?.focus();
+    } catch (e) {}
+  }
+
+  function openAll() {
+    allOpen = true;
+    $('all').classList.add('open');
+    var first = $('allapps').querySelector('button');
+    if (first) first.focus();
+  }
+  function closeAll() {
+    allOpen = false;
+    $('all').classList.remove('open');
+    var first = $('apps').querySelector('button');
+    if (first) first.focus();
+  }
+
+  $('settings').addEventListener('click', function () {
+    if (window.Android && window.Android.openSettings) window.Android.openSettings();
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-action="all"]');
+    if (b) openAll();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' || e.key === 'Backspace') {
+      if (allOpen) { closeAll(); e.preventDefault(); }
+      return;
+    }
+    if (e.key === 'Home') {
+      if (allOpen) closeAll();
+      return;
+    }
+
+    var keys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'];
+    if (keys.indexOf(e.key) < 0) return;
+
+    var container = allOpen ? $('allapps') : $('apps');
+    var items = Array.prototype.slice.call(container.querySelectorAll('button'));
+    var i = items.indexOf(document.activeElement);
+    if (i < 0) {
+      (items[0] || $('settings')).focus();
+      e.preventDefault();
+      return;
+    }
+    var cols = allOpen ? 7 : 5;
+    if (e.key === 'ArrowRight') i = Math.min(items.length - 1, i + 1);
+    if (e.key === 'ArrowLeft') i = Math.max(0, i - 1);
+    if (e.key === 'ArrowDown') i = Math.min(items.length - 1, i + cols);
+    if (e.key === 'ArrowUp') i = Math.max(0, i - cols);
+    items[i].focus();
+    e.preventDefault();
+  });
+
+  window.refreshApps = refreshApps;
+  window.onBack = function () { if (allOpen) closeAll(); };
+  window.onHome = function () { if (allOpen) closeAll(); };
+  setTimeout(refreshApps, 300);
+})();
+</script>
+</body>
+</html>
