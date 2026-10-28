@@ -291,7 +291,7 @@ footer {
       more.innerHTML = '<span class="tile"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><span class="label">Todas las apps</span>';
       home.appendChild(more);
       more.addEventListener('click', openAll);
-      home.querySelector('.app')?.focus();
+      var firstHomeApp = home.querySelector('.app'); if (firstHomeApp) firstHomeApp.focus();
     } catch (e) {}
   }
 
@@ -313,7 +313,7 @@ footer {
   });
 
   document.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-action="all"]');
+    var target = e.target; while (target && target !== document) { if (target.getAttribute && target.getAttribute('data-action') === 'all') { openAll(); return; } target = target.parentNode; }
     if (b) openAll();
   });
 
