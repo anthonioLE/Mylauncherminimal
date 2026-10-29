@@ -2,7 +2,9 @@ package com.milauncher.tv;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
@@ -52,6 +54,7 @@ public class MainActivity extends Activity {
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
+        s.setDomStorageEnabled(true);   // guarda el último clima válido
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(false);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
@@ -155,17 +158,21 @@ public class MainActivity extends Activity {
             }
         }
 
-        // Accesos elegidos por el usuario para la fila principal (JSON de paquetes; "" = sin configurar)
+        // "wifi", "eth" o "none" (solo lectura del estado de red)
         @JavascriptInterface
-        public String getPins() {
-            return getSharedPreferences("launcher", MODE_PRIVATE).getString("pins", "");
-        }
-
-        @JavascriptInterface
-        public void setPins(String json) {
-            SharedPreferences.Editor e = getSharedPreferences("launcher", MODE_PRIVATE).edit();
-            e.putString("pins", json == null ? "" : json);
-            e.apply();
+        public String getNet() {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+                Network n = cm.getActiveNetwork();
+                if (n == null) return "none";
+                NetworkCapabilities c = cm.getNetworkCapabilities(n);
+                if (c == null) return "none";
+                if (c.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return "wifi";
+                if (c.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) return "eth";
+                return "other";
+            } catch (Exception e) {
+                return "none";
+            }
         }
 
         @JavascriptInterface

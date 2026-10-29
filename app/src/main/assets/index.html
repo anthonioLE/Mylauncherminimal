@@ -9,12 +9,12 @@
   :root {
     --u: calc(100vw / 1280);
     --fg: #f1f5fb;
-    --muted: #b4c3da;
+    --muted: #aebdd6;
     --blue: #3ea6ff;
-    --line: #8ec5ff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { width: 100%; height: 100%; overflow: hidden; background: #07102a; }
+  /* Fondo fijo. Para un azul sólido sin imagen: borra la parte url(...) y deja solo el color. */
   body {
     font-family: Roboto, "Segoe UI", -apple-system, Helvetica, Arial, sans-serif;
     color: var(--fg);
@@ -22,451 +22,316 @@
   }
   button { outline: none; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
 
-  /* ---------- Barra superior ---------- */
-  .top {
-    height: calc(110 * var(--u));
-    padding: calc(34 * var(--u)) calc(52 * var(--u)) 0;
-    display: flex; justify-content: space-between; align-items: flex-start;
-  }
-  .left { display: flex; align-items: baseline; }
-  .clock { font-size: calc(48 * var(--u)); font-weight: 500; line-height: 1; letter-spacing: -.01em; }
-  .date { font-size: calc(21 * var(--u)); color: var(--muted); margin-left: calc(22 * var(--u));}
-  .date::first-letter { text-transform: uppercase; }
+  /* ---------- Encabezado fijo ---------- */
+  .top { position: fixed; left: 0; right: 0; top: 0; height: calc(200 * var(--u)); padding: calc(34 * var(--u)) calc(64 * var(--u)) 0; }
+  .hello { font-size: calc(28 * var(--u)); font-weight: 500; color: #bcd6ff; line-height: 1.1; }
+  .clock { font-size: calc(80 * var(--u)); font-weight: 500; line-height: 1; letter-spacing: -.01em; margin-top: calc(6 * var(--u)); }
+  .date { font-size: calc(24 * var(--u)); color: var(--muted); margin-top: calc(8 * var(--u)); }
 
-  .right { display: flex; align-items: center; }
-  .weather { display: flex; align-items: center; margin-right: calc(22 * var(--u)); }
-  .weather.off { visibility: hidden; }
-  .w-ico { font-size: calc(34 * var(--u)); line-height: 1; margin-right: calc(10 * var(--u)); }
-  .w-t { font-size: calc(28 * var(--u)); font-weight: 500; line-height: 1.05; }
-  .w-c { font-size: calc(15 * var(--u)); color: var(--muted); }
+  .right { position: absolute; right: calc(64 * var(--u)); top: calc(30 * var(--u)); display: flex; flex-direction: column; align-items: flex-end; }
+  .icons { display: flex; align-items: center; }
+  #wifi { width: calc(30 * var(--u)); height: calc(30 * var(--u)); margin-right: calc(16 * var(--u)); fill: none; stroke: #cfe3ff; stroke-width: 2; stroke-linecap: round; }
+  #wifi.off { stroke: #6f7f9a; }
+  #wifi .x { display: none; }
+  #wifi.off .x { display: inline; }
   .settings {
     width: calc(52 * var(--u)); height: calc(52 * var(--u)); border-radius: calc(14 * var(--u));
     color: #dbe7f7; border: calc(2 * var(--u)) solid transparent;
     display: flex; align-items: center; justify-content: center;
-    transition: transform .17s ease-out;
+    transition: transform .15s ease-out;
   }
   .settings svg { width: calc(30 * var(--u)); height: calc(30 * var(--u)); fill: currentColor; }
-  .settings:focus { transform: scale(1.2); border-color: var(--blue); background: rgba(62,166,255,.16); box-shadow: 0 0 calc(14 * var(--u)) rgba(62,166,255,.55); }
+  .settings:focus { transform: scale(1.15); border-color: var(--blue); background: rgba(62,166,255,.16); box-shadow: 0 0 calc(14 * var(--u)) rgba(62,166,255,.5); }
 
-  /* ---------- Fila principal ---------- */
-  .main {
-    margin-top: calc(78 * var(--u));
-    display: flex; justify-content: center; align-items: flex-start;
-    gap: calc(46 * var(--u));
-    height: calc(200 * var(--u));
-  }
-  .app {
-    width: calc(124 * var(--u));
-    display: flex; flex-direction: column; align-items: center;
-    transition: transform .17s ease-out;
-  }
+  .weather { display: flex; align-items: center; margin-top: calc(20 * var(--u)); }
+  .w-ico { font-size: calc(44 * var(--u)); line-height: 1; margin-right: calc(12 * var(--u)); }
+  .w-t { font-size: calc(40 * var(--u)); font-weight: 500; line-height: 1; }
+  .w-d { font-size: calc(18 * var(--u)); color: var(--fg); text-align: right; margin-top: calc(4 * var(--u)); }
+  .w-s { font-size: calc(15 * var(--u)); color: var(--muted); text-align: right; margin-top: calc(2 * var(--u)); }
+  .w-box { display: flex; flex-direction: column; align-items: flex-end; }
+  .w-row { display: flex; align-items: center; }
+
+  /* ---------- Filas de apps (solo esto se desplaza) ---------- */
+  #view { position: fixed; left: 0; right: 0; top: calc(205 * var(--u)); bottom: 0; overflow: hidden; }
+  #track { position: absolute; left: 0; right: 0; top: 0; transition: transform .22s ease-out; will-change: transform; }
+  .row { height: calc(212 * var(--u)); padding: calc(14 * var(--u)) 0 0 calc(86 * var(--u)); display: flex; gap: calc(44 * var(--u)); opacity: .5; transition: opacity .15s linear; }
+  .row.cur { opacity: 1; }
+  .app { width: calc(148 * var(--u)); display: flex; flex-direction: column; align-items: center; transition: transform .15s ease-out; }
   .tile {
-    width: calc(120 * var(--u)); height: calc(120 * var(--u));
-    border-radius: calc(26 * var(--u));
+    width: calc(148 * var(--u)); height: calc(148 * var(--u)); border-radius: calc(32 * var(--u));
     border: calc(3 * var(--u)) solid rgba(255,255,255,.14);
-    background: rgba(14,28,60,.72);
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
+    background: rgba(14,28,60,.72); overflow: hidden;
   }
   .tile img { width: 100%; height: 100%; display: block; }
-  .tile svg { width: calc(52 * var(--u)); height: calc(52 * var(--u)); }
-  .add .tile { border-style: dashed; border-color: rgba(142,197,255,.5); background: rgba(14,28,60,.38); }
-  .name {
-    margin-top: calc(12 * var(--u)); max-width: calc(140 * var(--u));
-    font-size: calc(17 * var(--u)); color: #e4ecf8; text-align: center;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .app:focus { transform: scale(1.25); }
-  .app:focus .tile { border-style: solid; border-color: var(--blue); box-shadow: 0 0 calc(22 * var(--u)) rgba(62,166,255,.65); }
+  .name { margin-top: calc(10 * var(--u)); max-width: calc(160 * var(--u)); font-size: calc(18 * var(--u)); color: #e4ecf8; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app:focus { transform: scale(1.12); }
+  .app:focus .tile { border-color: var(--blue); box-shadow: 0 0 calc(22 * var(--u)) rgba(62,166,255,.6); }
   .app:focus .name { color: #fff; }
-
-  /* ---------- Navegación inferior ---------- */
-  .nav {
-    margin-top: calc(66 * var(--u));
-    display: flex; justify-content: center; gap: calc(44 * var(--u));
-  }
-  .nb {
-    width: calc(128 * var(--u)); padding: calc(12 * var(--u)) 0 calc(10 * var(--u));
-    border-radius: calc(18 * var(--u)); border: calc(2 * var(--u)) solid transparent;
-    display: flex; flex-direction: column; align-items: center;
-    color: var(--line);
-    transition: transform .17s ease-out;
-  }
-  .nb svg { width: calc(40 * var(--u)); height: calc(40 * var(--u)); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .nb span { margin-top: calc(8 * var(--u)); font-size: calc(16 * var(--u)); color: var(--muted); }
-  .nb:focus { transform: scale(1.12); border-color: var(--blue); background: rgba(62,166,255,.16); box-shadow: 0 0 calc(16 * var(--u)) rgba(62,166,255,.5); color: #cfe6ff; }
-  .nb:focus span { color: #fff; }
-
-  /* ---------- Pantalla secundaria (apps / agregar / categorías) ---------- */
-  #ov {
-    position: fixed; left: 0; top: 0; right: 0; bottom: 0; display: none;
-    background: #050c20;
-    padding: calc(40 * var(--u)) calc(60 * var(--u)) 0;
-  }
-  #ov.open { display: block; }
-  #ov h2 { font-size: calc(32 * var(--u)); font-weight: 500; }
-  #ov .sub { font-size: calc(17 * var(--u)); color: var(--muted); margin: calc(6 * var(--u)) 0 calc(24 * var(--u)); min-height: calc(22 * var(--u)); }
-  #ovbody { height: calc(560 * var(--u)); overflow: hidden; padding-top: calc(14 * var(--u)); }
-  #ovgrid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: calc(30 * var(--u)); justify-items: center; }
-  #ovgrid .tile { width: calc(96 * var(--u)); height: calc(96 * var(--u)); border-radius: calc(21 * var(--u)); position: relative; }
-  #ovgrid .name { max-width: calc(150 * var(--u)); font-size: calc(16 * var(--u)); }
-  #ovgrid .app { width: calc(150 * var(--u)); }
-  #ovgrid .app:focus { transform: scale(1.18); }
-  .cat .tile { flex-direction: column; color: var(--line); }
-  .cat .tile b { font-size: calc(34 * var(--u)); font-weight: 500; color: #fff; }
-  .chk {
-    position: absolute; right: calc(5 * var(--u)); top: calc(5 * var(--u));
-    width: calc(24 * var(--u)); height: calc(24 * var(--u)); border-radius: 50%;
-    background: var(--blue); color: #03122b; font-size: calc(16 * var(--u)); font-weight: 700;
-    display: none; align-items: center; justify-content: center;
-  }
-  .pinned .chk { display: flex; }
-  .empty { grid-column: 1 / -1; color: var(--muted); font-size: calc(20 * var(--u)); padding: calc(30 * var(--u)) 0; }
-  #toast {
-    position: fixed; left: 50%; bottom: calc(34 * var(--u)); transform: translateX(-50%);
-    background: rgba(62,166,255,.95); color: #03122b; font-size: calc(18 * var(--u)); font-weight: 500;
-    padding: calc(10 * var(--u)) calc(22 * var(--u)); border-radius: calc(24 * var(--u)); display: none;
-  }
+  .empty { padding: calc(60 * var(--u)) calc(86 * var(--u)); font-size: calc(22 * var(--u)); color: var(--muted); }
 </style>
 </head>
 <body>
   <div class="top">
-    <div class="left">
-      <div class="clock" id="clock">--:--</div>
-      <div class="date" id="date"></div>
-    </div>
+    <div class="hello" id="hello"></div>
+    <div class="clock" id="clock">--:--</div>
+    <div class="date" id="date"></div>
+
     <div class="right">
-      <div class="weather off" id="weather">
-        <div class="w-ico" id="wIco">⛅</div>
-        <div>
-          <div class="w-t" id="wT">--°C</div>
-          <div class="w-c" id="wC"></div>
+      <div class="icons">
+        <svg id="wifi" viewBox="0 0 24 24" style="visibility:hidden"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/><path class="x" d="M4 4l16 16"/></svg>
+        <button class="settings" id="btnSettings" aria-label="Ajustes">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+      </div>
+      <div class="weather" id="weather">
+        <div class="w-ico" id="wIco"></div>
+        <div class="w-box">
+          <div class="w-t" id="wT">--</div>
         </div>
       </div>
-      <button class="settings" id="btnSettings" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-      </button>
+      <div class="w-d" id="wD">Clima no disponible</div>
+      <div class="w-s" id="wS"></div>
     </div>
   </div>
 
-  <div class="main" id="main"></div>
-
-  <div class="nav" id="nav">
-    <button class="nb" data-nav="apps"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>Mis apps</span></button>
-    <button class="nb" data-nav="movies"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg><span>Películas</span></button>
-    <button class="nb" data-nav="series"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 3l4 4 4-4"/></svg><span>Series</span></button>
-    <button class="nb" data-nav="music"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span>Música</span></button>
-    <button class="nb" data-nav="cats"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg><span>Categorías</span></button>
-  </div>
-
-  <div id="ov">
-    <h2 id="ovTitle"></h2>
-    <div class="sub" id="ovSub"></div>
-    <div id="ovbody"><div id="ovgrid"></div></div>
-  </div>
-  <div id="toast"></div>
+  <div id="view"><div id="track"></div></div>
 
 <script>
 (function () {
   /* ===== AJUSTES FÁCILES ===== */
   var CIUDAD = 'León, Gto.';
   var LAT = 21.1221, LON = -101.6824;
-  var HORA_12 = false;                  // false = 17:54 (24 h)
-  var MAXPIN = 6;                       // accesos en la fila principal (+ «Agregar»)
-
-  // Accesos iniciales (mientras no elijas los tuyos con «Agregar»)
-  var PINNED = [
+  var HORA_12 = false;                 // false = 17:54 (24 h)
+  var POR_FILA = 6;                    // apps por fila
+  var PINNED = [                       // van primero, en este orden (solo si están instaladas)
     'com.xuper.netxxus', 'com.netflix.ninja', 'com.google.android.youtube.tv',
     'com.amazon.amazonvideo.livingroom', 'com.disney.disneyplus', 'com.wbd.stream',
-    'com.spotify.tv.android', 'org.xbmc.kodi', 'com.android.chrome', 'com.android.vending'
+    'com.apple.atve.androidtv.appletv', 'com.spotify.tv.android', 'org.xbmc.kodi',
+    'com.android.chrome', 'com.android.vending'
   ];
-  // Apps que se reconocen como video / música aunque Android no las clasifique
-  var VIDEO_PKGS = ['com.xuper.netxxus', 'com.netflix.ninja', 'com.netflix.mediaclient',
-    'com.google.android.youtube.tv', 'com.google.android.youtube', 'com.amazon.amazonvideo.livingroom',
-    'com.disney.disneyplus', 'com.wbd.stream', 'com.hbo.hbonow', 'org.xbmc.kodi', 'com.plexapp.android',
-    'tv.pluto.android', 'com.crunchyroll.crunchyroid', 'com.google.android.videos', 'org.videolan.vlc',
-    'com.mxtech.videoplayer.ad', 'com.apple.atve.androidtv.appletv'];
-  var MUSIC_PKGS = ['com.spotify.tv.android', 'com.spotify.music', 'com.google.android.youtube.tvmusic',
-    'com.google.android.apps.youtube.music', 'com.amazon.mp3', 'deezer.android.tv', 'com.google.android.music'];
   /* =========================== */
 
-  var CATS = { '-1': 'Otras', '0': 'Juegos', '1': 'Música y audio', '2': 'Video', '3': 'Imágenes',
-               '4': 'Social', '5': 'Noticias', '6': 'Mapas', '7': 'Productividad' };
-  var OV_COLS = 7;
-
-  var main = document.getElementById('main');
-  var nav = document.getElementById('nav');
-  var ov = document.getElementById('ov');
-  var ovGrid = document.getElementById('ovgrid');
+  var PITCH = 212;                     // alto de una fila (px de diseño)
+  var SLOT = 225;                      // posición de la fila activa dentro del área desplazable
+  var track = document.getElementById('track');
   var settings = document.getElementById('btnSettings');
-  var apps = [], byPkg = {};
-  var pins = [];
-  var ovMode = null;        // 'apps' | 'pick' | 'cats'
-  var ovFrom = null;        // quién abrió la pantalla (para devolver el foco)
-  var ovBack = null;        // función para volver (categorías → lista)
+  var rows = [];                       // rows[r] = [botones]
+  var cur = { r: 0, c: 0 }, wantC = 0;
 
-  /* ---------- Reloj y fecha ---------- */
+  function $(id) { return document.getElementById(id); }
+  function unit() { return window.innerWidth / 1280; }
+
+  /* ---------- Saludo, hora y fecha (sin reconstruir nada) ---------- */
   var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
   var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
                'septiembre', 'octubre', 'noviembre', 'diciembre'];
-  var clockEl = document.getElementById('clock'), dateEl = document.getElementById('date');
-  var lastClock = '', lastDate = '';
+  var last = { clock: '', date: '', hello: '' };
+  function set(id, key, v) { if (last[key] !== v) { last[key] = v; $(id).textContent = v; } }
   function tick() {
-    var d = new Date(), h = d.getHours(), m = d.getMinutes(), txt;
-    if (HORA_12) txt = ('0' + (h % 12 || 12)).slice(-2) + ':' + ('0' + m).slice(-2) + (h < 12 ? ' AM' : ' PM');
-    else txt = ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
-    if (txt !== lastClock) { clockEl.textContent = txt; lastClock = txt; }
+    var d = new Date(), h = d.getHours(), m = d.getMinutes(), t;
+    if (HORA_12) t = ('0' + (h % 12 || 12)).slice(-2) + ':' + ('0' + m).slice(-2) + (h < 12 ? ' AM' : ' PM');
+    else t = ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
+    set('clock', 'clock', t);
     var ds = DIAS[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()];
-    if (ds !== lastDate) { dateEl.textContent = ds; lastDate = ds; }
+    set('date', 'date', ds.charAt(0).toUpperCase() + ds.slice(1));
+    set('hello', 'hello', h >= 5 && h < 12 ? 'Buenos días' : h >= 12 && h < 19 ? 'Buenas tardes' : 'Buenas noches');
   }
   tick();
-  setInterval(tick, 15000);
+  setInterval(tick, 10000);
+
+  /* ---------- Wi-Fi ---------- */
+  function net() {
+    var w = $('wifi'), s = 'none';
+    try { s = window.Android.getNet(); } catch (e) { return; }
+    w.style.visibility = 'visible';
+    var off = s === 'none';
+    if (w.classList.contains('off') !== off) w.classList.toggle('off', off);
+  }
+  net();
+  setInterval(net, 20000);
 
   /* ---------- Clima (Open-Meteo, sin clave) ---------- */
-  function wicon(code, day) {
-    if (code === 0) return day ? '☀️' : '🌙';
-    if (code <= 2) return day ? '⛅' : '☁️';
-    if (code === 3) return '☁️';
-    if (code <= 48) return '🌫️';
-    if (code <= 67 || (code >= 80 && code <= 82)) return '🌧️';
-    if (code <= 77 || code === 85 || code === 86) return '❄️';
+  var WX_KEY = 'wx1', wxTimer = 0;
+  function wdesc(c) {
+    if (c === 0) return 'Despejado';
+    if (c === 1) return 'Mayormente despejado';
+    if (c === 2) return 'Parcialmente nublado';
+    if (c === 3) return 'Nublado';
+    if (c === 45 || c === 48) return 'Niebla';
+    if (c >= 51 && c <= 57) return 'Llovizna';
+    if (c >= 61 && c <= 67) return 'Lluvia';
+    if (c >= 71 && c <= 77) return 'Nieve';
+    if (c >= 80 && c <= 82) return 'Chubascos';
+    if (c === 85 || c === 86) return 'Nevadas';
+    if (c >= 95) return 'Tormenta';
+    return 'Variable';
+  }
+  function wicon(c, day) {
+    if (c === 0) return day ? '☀️' : '🌙';
+    if (c <= 2) return day ? '⛅' : '☁️';
+    if (c === 3) return '☁️';
+    if (c <= 48) return '🌫️';
+    if (c <= 67 || (c >= 80 && c <= 82)) return '🌧️';
+    if (c <= 77 || c === 85 || c === 86) return '❄️';
     return '⛈️';
   }
-  function weather() {
-    try {
-      var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
-        '&current=temperature_2m,weather_code,is_day';
-      fetch(url).then(function (r) { return r.json(); }).then(function (j) {
-        var c = j.current;
-        document.getElementById('wIco').textContent = wicon(c.weather_code, c.is_day === 1);
-        document.getElementById('wT').textContent = Math.round(c.temperature_2m) + '°C';
-        document.getElementById('wC').textContent = CIUDAD;
-        document.getElementById('weather').classList.remove('off');
-      }).catch(function () {});
-    } catch (e) {}
+  function showWx(w, stale) {
+    $('wIco').textContent = wicon(w.code, w.day);
+    $('wT').textContent = Math.round(w.t) + '°C';
+    $('wD').textContent = wdesc(w.code);
+    var hh = new Date(w.ts);
+    var s = 'Sensación ' + Math.round(w.f) + '°C · ' + CIUDAD;
+    if (stale) s = 'Dato anterior (' + ('0' + hh.getHours()).slice(-2) + ':' + ('0' + hh.getMinutes()).slice(-2) + ') · ' + CIUDAD;
+    $('wS').textContent = s;
   }
+  function noWx() {
+    $('wIco').textContent = '';
+    $('wT').textContent = '';
+    $('wD').textContent = 'Clima no disponible';
+    $('wS').textContent = CIUDAD;
+  }
+  function cached() {
+    try { var j = JSON.parse(localStorage.getItem(WX_KEY)); if (j && typeof j.t === 'number') return j; } catch (e) {}
+    return null;
+  }
+  function weather() {
+    clearTimeout(wxTimer);
+    var retry = 5 * 60 * 1000;
+    var done = false;
+    function fail() {
+      if (done) return; done = true;
+      var c = cached();
+      if (c) showWx(c, true); else noWx();
+      wxTimer = setTimeout(weather, retry);
+    }
+    try {
+      var ctl = window.AbortController ? new AbortController() : null;
+      var to = setTimeout(function () { if (ctl) ctl.abort(); fail(); }, 12000);
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
+        '&current=temperature_2m,apparent_temperature,weather_code,is_day';
+      fetch(url, ctl ? { signal: ctl.signal } : undefined).then(function (r) {
+        if (!r.ok) throw 0; return r.json();
+      }).then(function (j) {
+        clearTimeout(to);
+        var c = j && j.current;
+        if (!c || typeof c.temperature_2m !== 'number' || typeof c.weather_code !== 'number') throw 0;
+        if (done) return; done = true;
+        var w = { t: c.temperature_2m, f: typeof c.apparent_temperature === 'number' ? c.apparent_temperature : c.temperature_2m,
+                  code: c.weather_code, day: c.is_day === 1, ts: Date.now() };
+        try { localStorage.setItem(WX_KEY, JSON.stringify(w)); } catch (e) {}
+        showWx(w, false);
+        wxTimer = setTimeout(weather, 30 * 60 * 1000);
+      }).catch(function () { clearTimeout(to); fail(); });
+    } catch (e) { fail(); }
+  }
+  (function () { var c = cached(); if (c) showWx(c, true); else noWx(); })();
   weather();
-  setInterval(weather, 30 * 60 * 1000);
 
-  /* ---------- Utilidades ---------- */
+  /* ---------- Apps ---------- */
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
   }
-  function appBtn(a, cls) {
-    return '<button class="app ' + (cls || '') + '" data-pkg="' + esc(a.pkg) + '"><div class="tile">' +
-      '<img alt="" decoding="async" src="https://icons.local/' + encodeURIComponent(a.pkg) + '">' +
-      '<span class="chk">✓</span></div><div class="name">' + esc(a.label) + '</div></button>';
-  }
-  var PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="#8ec5ff" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
-  var ADD_BTN = '<button class="app add" data-add="1"><div class="tile">' + PLUS + '</div><div class="name">Agregar</div></button>';
-
-  var toastT = 0;
-  function toast(msg) {
-    var t = document.getElementById('toast');
-    t.textContent = msg; t.style.display = 'block';
-    clearTimeout(toastT);
-    toastT = setTimeout(function () { t.style.display = 'none'; }, 2600);
-  }
-
-  /* ---------- Fila principal ---------- */
-  function loadPins() {
-    var saved = '';
-    try { saved = window.Android.getPins(); } catch (e) {}
-    var list = null;
-    if (saved) { try { list = JSON.parse(saved); } catch (e) { list = null; } }
-    if (!list) list = PINNED.slice();
-    pins = list.filter(function (p) { return byPkg[p]; });
-    if (!saved) {                       // sin configurar: completar con las primeras apps
-      pins = pins.slice(0, MAXPIN);
-      for (var i = 0; i < apps.length && pins.length < MAXPIN; i++) {
-        if (pins.indexOf(apps[i].pkg) < 0) pins.push(apps[i].pkg);
-      }
-    }
-    pins = pins.slice(0, MAXPIN);
-  }
-  function savePins() { try { window.Android.setPins(JSON.stringify(pins)); } catch (e) {} }
-
-  var lastKey = null;
-  function renderMain(force) {
-    var key = pins.join('|') + '#' + apps.length;
-    if (!force && key === lastKey) return;
-    lastKey = key;
-    var ae = document.activeElement;
-    var had = ae && ae.dataset && main.contains(ae) ? (ae.dataset.pkg || (ae.dataset.add ? '__add' : null)) : null;
-    var html = '';
-    pins.forEach(function (p) { html += appBtn(byPkg[p]); });
-    main.innerHTML = html + ADD_BTN;
-    if (!ov.classList.contains('open')) {
-      var f = null;
-      if (had === '__add') f = main.querySelector('[data-add]');
-      else if (had) f = main.querySelector('[data-pkg="' + had + '"]');
-      (f || main.querySelector('.app') || settings).focus();
-    }
-  }
-
   var lastRaw = null;
   function refresh(force) {
     var raw = '[]';
     try { raw = window.Android.getApps(); } catch (e) {}
-    if (!force && raw === lastRaw) return;
+    if (!force && raw === lastRaw) return;       // lista igual: no se toca el DOM
     lastRaw = raw;
-    try { apps = JSON.parse(raw); } catch (e) { apps = []; }
-    byPkg = {};
-    apps.forEach(function (a) { byPkg[a.pkg] = a; });
-    loadPins();
-    renderMain(true);
-  }
+    var apps = [];
+    try { apps = JSON.parse(raw); } catch (e) {}
 
-  /* ---------- Pantalla secundaria ---------- */
-  function showOv(mode, title, sub, html, from) {
-    ovMode = mode;
-    if (from) ovFrom = from;
-    document.getElementById('ovTitle').textContent = title;
-    document.getElementById('ovSub').textContent = sub || '';
-    ovGrid.innerHTML = html;
-    ov.classList.add('open');
-    document.getElementById('ovbody').scrollTop = 0;
-    var f = ovGrid.querySelector('.app'); if (f) f.focus();
-  }
-  function closeOv() {
-    ov.classList.remove('open');
-    ovMode = null; ovBack = null;
-    document.getElementById('toast').style.display = 'none';
-    renderMain(true);
-    var f = null;
-    if (ovFrom === 'add') f = main.querySelector('[data-add]');
-    else if (ovFrom) f = nav.querySelector('[data-nav="' + ovFrom + '"]');
-    (f || main.querySelector('.app') || settings).focus();
-  }
-  function listHtml(list, emptyMsg) {
-    var h = '';
-    list.forEach(function (a) { h += appBtn(a, pins.indexOf(a.pkg) >= 0 && ovMode === 'pick' ? 'pinned' : ''); });
-    return h || '<div class="empty">' + emptyMsg + '</div>';
-  }
-  function filtered(kind) {
-    return apps.filter(function (a) {
-      if (kind === 'video') return a.cat === 2 || VIDEO_PKGS.indexOf(a.pkg) >= 0;
-      if (kind === 'music') return a.cat === 1 || MUSIC_PKGS.indexOf(a.pkg) >= 0;
-      return true;
-    });
-  }
-  function openCats() {
-    var count = {};
-    apps.forEach(function (a) {
-      var k = a.cat;
-      if (a.cat !== 1 && MUSIC_PKGS.indexOf(a.pkg) >= 0) k = 1;
-      else if (a.cat !== 2 && VIDEO_PKGS.indexOf(a.pkg) >= 0) k = 2;
-      if (!CATS.hasOwnProperty(String(k))) k = -1;
-      a._k = k; count[k] = (count[k] || 0) + 1;
-    });
-    var h = '';
-    Object.keys(CATS).forEach(function (k) {
-      if (!count[k]) return;
-      h += '<button class="app cat" data-cat="' + k + '"><div class="tile"><b>' + count[k] + '</b></div><div class="name">' + CATS[k] + '</div></button>';
-    });
-    showOv('cats', 'Categorías', 'Según la clasificación de cada app instalada', h || '<div class="empty">No se encontraron apps.</div>');
-    ovBack = null;
-  }
-  function openNav(name) {
-    if (name === 'apps') showOv('apps', 'Mis apps', apps.length + ' instaladas', listHtml(apps, 'No se encontraron apps.'), 'apps');
-    else if (name === 'movies') showOv('apps', 'Películas', 'Apps de video instaladas', listHtml(filtered('video'), 'No hay apps de video instaladas.'), 'movies');
-    else if (name === 'series') showOv('apps', 'Series', 'Apps de video instaladas', listHtml(filtered('video'), 'No hay apps de video instaladas.'), 'series');
-    else if (name === 'music') showOv('apps', 'Música', 'Apps de música y audio instaladas', listHtml(filtered('music'), 'No hay apps de música instaladas.'), 'music');
-    else if (name === 'cats') { ovFrom = 'cats'; openCats(); }
-  }
-  function openPick() {
-    ovMode = 'pick';
-    showOv('pick', 'Agregar accesos', 'OK marca o quita una app de la fila principal (máx. ' + MAXPIN + ') · Atrás para terminar',
-      listHtml(apps, 'No se encontraron apps.'), 'add');
-  }
-  function openCat(k) {
-    var list = apps.filter(function (a) { return a._k === Number(k); });
-    ovBack = openCats;
-    showOv('apps', CATS[k], list.length + ' apps', listHtml(list, 'Sin apps.'));
-  }
+    var by = {}, used = {}, ordered = [];
+    apps.forEach(function (a) { by[a.pkg] = a; });
+    PINNED.forEach(function (p) { if (by[p] && !used[p]) { ordered.push(by[p]); used[p] = 1; } });
+    apps.forEach(function (a) { if (!used[a.pkg]) { ordered.push(a); used[a.pkg] = 1; } });
 
-  /* ---------- Clics / OK ---------- */
-  document.addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('button') : null;
-    if (!b) return;
-    if (b.id === 'btnSettings') { window.Android.openSettings(); return; }
-    if (b.dataset.nav) { openNav(b.dataset.nav); return; }
-    if (b.dataset.add) { openPick(); return; }
-    if (b.dataset.cat) { openCat(b.dataset.cat); return; }
-    if (b.dataset.pkg) {
-      if (ovMode === 'pick') {
-        var i = pins.indexOf(b.dataset.pkg);
-        if (i >= 0) { pins.splice(i, 1); b.classList.remove('pinned'); savePins(); }
-        else if (pins.length >= MAXPIN) { toast('Máximo ' + MAXPIN + ' accesos: quita uno primero'); }
-        else { pins.push(b.dataset.pkg); b.classList.add('pinned'); savePins(); }
-        return;
-      }
-      window.Android.launch(b.dataset.pkg);
+    var ae = document.activeElement;
+    var had = ae && ae.dataset ? ae.dataset.pkg : null;
+
+    if (!ordered.length) {
+      track.innerHTML = '<div class="empty">No se encontraron aplicaciones.</div>';
+      rows = []; settings.focus(); return;
     }
-  });
-
-  /* ---------- Control remoto ---------- */
-  function cx(el) { var r = el.getBoundingClientRect(); return r.left + r.width / 2; }
-  function closest(list, x) {
-    var best = list[0], d = 1e9;
-    for (var i = 0; i < list.length; i++) {
-      var dd = Math.abs(cx(list[i]) - x);
-      if (dd < d) { d = dd; best = list[i]; }
+    var html = '';
+    for (var i = 0; i < ordered.length; i += POR_FILA) {
+      html += '<div class="row">';
+      ordered.slice(i, i + POR_FILA).forEach(function (a) {
+        html += '<button class="app" data-pkg="' + esc(a.pkg) + '"><div class="tile"><img alt="" decoding="async" src="https://icons.local/' +
+          encodeURIComponent(a.pkg) + '"></div><div class="name">' + esc(a.label) + '</div></button>';
+      });
+      html += '</div>';
     }
-    return best;
+    track.innerHTML = html;
+    var rowEls = track.querySelectorAll('.row');
+    rows = [];
+    for (var r = 0; r < rowEls.length; r++) rows.push(Array.prototype.slice.call(rowEls[r].querySelectorAll('.app')));
+
+    var r0 = 0, c0 = 0;
+    if (had) rows.forEach(function (row, r) { row.forEach(function (b, c) { if (b.dataset.pkg === had) { r0 = r; c0 = c; } }); });
+    go(r0, c0, true);
   }
+
+  /* ---------- Foco y desplazamiento vertical ---------- */
+  var curRowEl = null;
+  function scrollTo(r) {
+    var y = (SLOT - r * PITCH) * unit();
+    track.style.transform = 'translate3d(0,' + y + 'px,0)';
+    var el = track.children[r];
+    if (el !== curRowEl) {
+      if (curRowEl) curRowEl.classList.remove('cur');
+      if (el) el.classList.add('cur');
+      curRowEl = el;
+    }
+  }
+  function go(r, c, keepWant) {
+    if (!rows.length) return;
+    r = Math.max(0, Math.min(rows.length - 1, r));
+    c = Math.max(0, Math.min(rows[r].length - 1, c));
+    cur.r = r; cur.c = c;
+    if (!keepWant) wantC = c;
+    scrollTo(r);
+    var b = rows[r][c];
+    if (document.activeElement !== b) b.focus({ preventScroll: true });
+  }
+
   document.addEventListener('keydown', function (e) {
     var k = e.key;
     if (k !== 'ArrowRight' && k !== 'ArrowLeft' && k !== 'ArrowDown' && k !== 'ArrowUp') return;
-    var cur = document.activeElement, t = null;
-
-    if (ov.classList.contains('open')) {
-      var items = Array.prototype.slice.call(ovGrid.querySelectorAll('.app'));
-      var i = items.indexOf(cur);
-      if (i < 0) { if (items.length) items[0].focus(); e.preventDefault(); return; }
-      var n = k === 'ArrowRight' ? i + 1 : k === 'ArrowLeft' ? i - 1 : k === 'ArrowDown' ? i + OV_COLS : i - OV_COLS;
-      e.preventDefault();
-      if (n >= 0 && n < items.length) { items[n].focus(); items[n].scrollIntoView({ block: 'nearest' }); }
-      else if (k === 'ArrowDown' && i < items.length - 1 && Math.floor(i / OV_COLS) < Math.floor((items.length - 1) / OV_COLS)) {
-        items[items.length - 1].focus(); items[items.length - 1].scrollIntoView({ block: 'nearest' });
-      }
-      return;
-    }
-
-    var mainItems = Array.prototype.slice.call(main.querySelectorAll('.app'));
-    var navItems = Array.prototype.slice.call(nav.querySelectorAll('.nb'));
-    var row = cur === settings ? 0 : mainItems.indexOf(cur) >= 0 ? 1 : navItems.indexOf(cur) >= 0 ? 2 : -1;
-    if (row < 0) { (mainItems[0] || settings).focus(); e.preventDefault(); return; }
     e.preventDefault();
-
-    if (k === 'ArrowRight' || k === 'ArrowLeft') {
-      var list = row === 1 ? mainItems : row === 2 ? navItems : null;
-      if (!list) return;
-      var j = list.indexOf(cur) + (k === 'ArrowRight' ? 1 : -1);
-      if (j >= 0 && j < list.length) list[j].focus();
-      else if (row === 1 && k === 'ArrowRight') { /* fin de la fila */ }
+    var a = document.activeElement;
+    if (a === settings) {
+      if (k === 'ArrowDown' || k === 'ArrowLeft') go(cur.r, wantC, true);
       return;
     }
-    var x = cx(cur);
-    if (k === 'ArrowDown') {
-      if (row === 0 && mainItems.length) t = closest(mainItems, x);
-      else if (row === 1) t = closest(navItems, x);
-    } else {
-      if (row === 2 && mainItems.length) t = closest(mainItems, x);
-      else if (row === 1) t = settings;
-    }
-    if (t) t.focus();
+    if (!rows.length) return;
+    // Si el foco se perdió, vuelve a la app actual
+    if (!a || !a.dataset || !a.dataset.pkg) { go(cur.r, cur.c, true); return; }
+    if (k === 'ArrowRight') go(cur.r, cur.c + 1);
+    else if (k === 'ArrowLeft') go(cur.r, cur.c - 1);
+    else if (k === 'ArrowDown') { if (cur.r < rows.length - 1) go(cur.r + 1, wantC, true); }
+    else { if (cur.r > 0) go(cur.r - 1, wantC, true); else settings.focus({ preventScroll: true }); }
   });
 
-  window.onBack = function () {
-    if (!ov.classList.contains('open')) return;
-    if (ovBack) { var b = ovBack; b(); } else closeOv();
-  };
-  window.refreshApps = function () { refresh(false); };
-  window.onHome = function () {
-    if (ov.classList.contains('open')) closeOv();
-    var f = main.querySelector('.app'); if (f) f.focus();
-  };
+  // Foco por cualquier otro medio (clic, etc.): mantener la fila visible
+  track.addEventListener('focusin', function (e) {
+    var b = e.target;
+    for (var r = 0; r < rows.length; r++) {
+      var c = rows[r].indexOf(b);
+      if (c >= 0) { if (r !== cur.r || c !== cur.c) { cur.r = r; cur.c = c; wantC = c; scrollTo(r); } return; }
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button') : null;
+    if (!b) return;
+    if (b.id === 'btnSettings') { try { window.Android.openSettings(); } catch (x) {} return; }
+    if (b.dataset.pkg) { try { window.Android.launch(b.dataset.pkg); } catch (x) {} }
+  });
+
+  window.onBack = function () { if (cur.r !== 0 || cur.c !== 0 || document.activeElement === settings) go(0, 0); };
+  window.onHome = window.onBack;
+  window.refreshApps = function () { tick(); net(); refresh(false); };
+  window.addEventListener('resize', function () { scrollTo(cur.r); });
   refresh(true);
 })();
 </script>
