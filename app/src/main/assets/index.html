@@ -54,16 +54,17 @@
   /* ---------- Filas de apps (solo esto se desplaza) ---------- */
   #view { position: fixed; left: 0; right: 0; top: calc(205 * var(--u)); bottom: 0; overflow: hidden; }
   #track { position: absolute; left: 0; right: 0; top: 0; transition: transform .22s ease-out; will-change: transform; }
-  .row { height: calc(212 * var(--u)); padding: calc(14 * var(--u)) 0 0 calc(86 * var(--u)); display: flex; gap: calc(44 * var(--u)); opacity: .5; transition: opacity .15s linear; }
+  .row { height: calc(190 * var(--u)); padding: calc(14 * var(--u)) calc(44 * var(--u)) 0; display: flex; justify-content: space-between; opacity: 0; transition: opacity .2s linear; }
   .row.cur { opacity: 1; }
-  .app { width: calc(148 * var(--u)); display: flex; flex-direction: column; align-items: center; transition: transform .15s ease-out; }
+  .row.prev { opacity: .5; }
+  .app { width: calc(124 * var(--u)); display: flex; flex-direction: column; align-items: center; transition: transform .15s ease-out; }
   .tile {
-    width: calc(148 * var(--u)); height: calc(148 * var(--u)); border-radius: calc(32 * var(--u));
+    width: calc(124 * var(--u)); height: calc(124 * var(--u)); border-radius: calc(27 * var(--u));
     border: calc(3 * var(--u)) solid rgba(255,255,255,.14);
     background: rgba(14,28,60,.72); overflow: hidden;
   }
   .tile img { width: 100%; height: 100%; display: block; }
-  .name { margin-top: calc(10 * var(--u)); max-width: calc(160 * var(--u)); font-size: calc(18 * var(--u)); color: #e4ecf8; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .name { margin-top: calc(8 * var(--u)); max-width: calc(132 * var(--u)); font-size: calc(17 * var(--u)); color: #e4ecf8; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .app:focus { transform: scale(1.12); }
   .app:focus .tile { border-color: var(--blue); box-shadow: 0 0 calc(22 * var(--u)) rgba(62,166,255,.6); }
   .app:focus .name { color: #fff; }
@@ -102,7 +103,7 @@
   var CIUDAD = 'León, Gto.';
   var LAT = 21.1221, LON = -101.6824;
   var HORA_12 = false;                 // false = 17:54 (24 h)
-  var POR_FILA = 6;                    // apps por fila
+  var POR_FILA = 8;                    // apps por fila
   var PINNED = [                       // van primero, en este orden (solo si están instaladas)
     'com.xuper.netxxus', 'com.netflix.ninja', 'com.google.android.youtube.tv',
     'com.amazon.amazonvideo.livingroom', 'com.disney.disneyplus', 'com.wbd.stream',
@@ -111,8 +112,8 @@
   ];
   /* =========================== */
 
-  var PITCH = 212;                     // alto de una fila (px de diseño)
-  var SLOT = 225;                      // posición de la fila activa dentro del área desplazable
+  var PITCH = 190;                     // alto de una fila (px de diseño)
+  var SLOT = 325;                      // posición de la fila activa dentro del área desplazable
   var track = document.getElementById('track');
   var settings = document.getElementById('btnSettings');
   var rows = [];                       // rows[r] = [botones]
@@ -261,7 +262,7 @@
       });
       html += '</div>';
     }
-    track.innerHTML = html;
+    track.innerHTML = html; shownRow = -1;
     var rowEls = track.querySelectorAll('.row');
     rows = [];
     for (var r = 0; r < rowEls.length; r++) rows.push(Array.prototype.slice.call(rowEls[r].querySelectorAll('.app')));
@@ -272,15 +273,15 @@
   }
 
   /* ---------- Foco y desplazamiento vertical ---------- */
-  var curRowEl = null;
+  var shownRow = -1;
   function scrollTo(r) {
     var y = (SLOT - r * PITCH) * unit();
     track.style.transform = 'translate3d(0,' + y + 'px,0)';
-    var el = track.children[r];
-    if (el !== curRowEl) {
-      if (curRowEl) curRowEl.classList.remove('cur');
-      if (el) el.classList.add('cur');
-      curRowEl = el;
+    if (r !== shownRow) {                 // solo se ve la fila activa y la anterior
+      shownRow = r;
+      for (var i = 0; i < track.children.length; i++) {
+        track.children[i].className = 'row' + (i === r ? ' cur' : i === r - 1 ? ' prev' : '');
+      }
     }
   }
   function go(r, c, keepWant) {
