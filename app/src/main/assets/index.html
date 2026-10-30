@@ -9,39 +9,39 @@
   :root {
     --u: calc(100vw / 1280);
     --fg: #f1f5fb;
-    --muted: #aebdd6;
-    --blue: #3ea6ff;
+    --muted: #c9a3a8;
+    --blue: #ff4d5e;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #07102a; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
   /* Fondo fijo. Para un azul sólido sin imagen: borra la parte url(...) y deja solo el color. */
   body {
     font-family: Roboto, "Segoe UI", -apple-system, Helvetica, Arial, sans-serif;
     color: var(--fg);
-    background: #07102a url("launcher-background.webp") center / cover no-repeat;
+    background: #000 radial-gradient(900px 560px at 88% 112%, rgba(110,14,26,.55), rgba(0,0,0,0) 72%);
   }
   button { outline: none; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
 
   /* ---------- Encabezado fijo ---------- */
   .top { position: fixed; left: 0; right: 0; top: 0; height: calc(200 * var(--u)); padding: calc(34 * var(--u)) calc(64 * var(--u)) 0; }
-  .hello { font-size: calc(28 * var(--u)); font-weight: 500; color: #bcd6ff; line-height: 1.1; }
+  .hello { font-size: calc(28 * var(--u)); font-weight: 500; color: #ffb3ba; line-height: 1.1; }
   .clock { font-size: calc(80 * var(--u)); font-weight: 500; line-height: 1; letter-spacing: -.01em; margin-top: calc(6 * var(--u)); }
   .date { font-size: calc(24 * var(--u)); color: var(--muted); margin-top: calc(8 * var(--u)); }
 
   .right { position: absolute; right: calc(64 * var(--u)); top: calc(30 * var(--u)); display: flex; flex-direction: column; align-items: flex-end; }
   .icons { display: flex; align-items: center; }
-  #wifi { width: calc(30 * var(--u)); height: calc(30 * var(--u)); margin-right: calc(16 * var(--u)); fill: none; stroke: #cfe3ff; stroke-width: 2; stroke-linecap: round; }
-  #wifi.off { stroke: #6f7f9a; }
+  #wifi { width: calc(30 * var(--u)); height: calc(30 * var(--u)); margin-right: calc(16 * var(--u)); fill: none; stroke: #ffd3d7; stroke-width: 2; stroke-linecap: round; }
+  #wifi.off { stroke: #7a5a5e; }
   #wifi .x { display: none; }
   #wifi.off .x { display: inline; }
   .settings {
     width: calc(52 * var(--u)); height: calc(52 * var(--u)); border-radius: calc(14 * var(--u));
-    color: #dbe7f7; border: calc(2 * var(--u)) solid transparent;
+    color: #ffd3d7; border: calc(2 * var(--u)) solid transparent;
     display: flex; align-items: center; justify-content: center;
     transition: transform .15s ease-out;
   }
   .settings svg { width: calc(30 * var(--u)); height: calc(30 * var(--u)); fill: currentColor; }
-  .settings:focus { transform: scale(1.15); border-color: var(--blue); background: rgba(62,166,255,.16); box-shadow: 0 0 calc(14 * var(--u)) rgba(62,166,255,.5); }
+  .settings:focus { transform: scale(1.15); border-color: var(--blue); background: rgba(255,77,94,.16); box-shadow: 0 0 calc(14 * var(--u)) rgba(255,77,94,.55); }
 
   .weather { display: flex; align-items: center; margin-top: calc(20 * var(--u)); }
   .w-ico { font-size: calc(44 * var(--u)); line-height: 1; margin-right: calc(12 * var(--u)); }
@@ -56,21 +56,35 @@
   #track { position: absolute; left: 0; right: 0; top: 0; transition: transform .22s ease-out; will-change: transform; }
   .row { height: calc(190 * var(--u)); padding: calc(14 * var(--u)) calc(44 * var(--u)) 0; display: flex; justify-content: space-between; opacity: 0; transition: opacity .2s linear; }
   .row.cur { opacity: 1; }
-  .row.prev { opacity: .5; }
-  .app { width: calc(124 * var(--u)); display: flex; flex-direction: column; align-items: center; transition: transform .15s ease-out; }
+  .row.prev { opacity: 0; }
+  .app { --c: #ff4d5e; --g: 255,77,94; width: calc(124 * var(--u)); display: flex; flex-direction: column; align-items: center; transition: transform .15s ease-out; }
   .tile {
     width: calc(124 * var(--u)); height: calc(124 * var(--u)); border-radius: calc(27 * var(--u));
-    border: calc(3 * var(--u)) solid rgba(255,255,255,.14);
-    background: rgba(14,28,60,.72); overflow: hidden;
+    border: calc(3 * var(--u)) solid rgba(var(--g),.65);
+    background: rgba(0,0,0,.55); overflow: hidden;
+    box-shadow: 0 0 calc(12 * var(--u)) rgba(var(--g),.35), inset 0 0 calc(12 * var(--u)) rgba(var(--g),.16);
   }
   .tile img { width: 100%; height: 100%; display: block; }
-  .tile.ln { display: flex; align-items: center; justify-content: center; background: rgba(14,28,60,.78); }
-  .tile.ln svg { width: 56%; height: 56%; fill: none; stroke: #8ec5ff; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .app:focus .tile.ln svg { stroke: #d6ebff; }
-  .name { margin-top: calc(8 * var(--u)); max-width: calc(132 * var(--u)); font-size: calc(17 * var(--u)); color: #e4ecf8; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.ln { display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.6); }
+  .tile.ln svg { width: 56%; height: 56%; fill: none; stroke: var(--c); stroke-width: 1.8; filter: drop-shadow(0 0 calc(4 * var(--u)) rgba(var(--g),.85)); stroke-linecap: round; stroke-linejoin: round; }
+  .app:focus .tile.ln svg { stroke-width: 2; }
+  .name { margin-top: calc(8 * var(--u)); max-width: calc(132 * var(--u)); font-size: calc(17 * var(--u)); color: #fbe9ea; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .app:focus { transform: scale(1.12); }
-  .app:focus .tile { border-color: var(--blue); box-shadow: 0 0 calc(22 * var(--u)) rgba(62,166,255,.6); }
+  .app:focus .tile { border-color: var(--c); box-shadow: 0 0 calc(26 * var(--u)) rgba(var(--g),.8), inset 0 0 calc(14 * var(--u)) rgba(var(--g),.25); }
   .app:focus .name { color: #fff; }
+  /* Tarjeta grande de la app seleccionada */
+  #hero { position: fixed; left: calc(64 * var(--u)); right: calc(64 * var(--u)); top: calc(215 * var(--u)); height: calc(272 * var(--u));
+    border-radius: calc(32 * var(--u)); border: calc(3 * var(--u)) solid #ff4d5e;
+    background: linear-gradient(135deg, #8c1424, #2a070c 75%);
+    box-shadow: 0 0 calc(30 * var(--u)) rgba(255,77,94,.55), inset 0 0 calc(30 * var(--u)) rgba(255,77,94,.18);
+    display: flex; align-items: center; padding: 0 calc(54 * var(--u)); }
+  #heroIco { width: calc(170 * var(--u)); height: calc(170 * var(--u)); border-radius: calc(40 * var(--u)); border: calc(3 * var(--u)) solid rgba(255,140,150,.7);
+    background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none; }
+  #heroIco svg { width: 62%; height: 62%; fill: none; stroke: #ffd3d7; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 calc(7 * var(--u)) rgba(255,77,94,.9)); }
+  #heroIco img { width: 100%; height: 100%; display: block; }
+  #heroTxt { margin-left: calc(48 * var(--u)); min-width: 0; }
+  #heroName { font-size: calc(54 * var(--u)); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #heroSub { font-size: calc(22 * var(--u)); color: #ffb3ba; margin-top: calc(8 * var(--u)); }
   .empty { padding: calc(60 * var(--u)) calc(86 * var(--u)); font-size: calc(22 * var(--u)); color: var(--muted); }
 </style>
 </head>
@@ -97,6 +111,8 @@
       <div class="w-s" id="wS"></div>
     </div>
   </div>
+
+  <div id="hero"><div id="heroIco"></div><div id="heroTxt"><div id="heroName"></div><div id="heroSub">Pulsa OK para abrir</div></div></div>
 
   <div id="view"><div id="track"></div></div>
 
@@ -126,6 +142,18 @@
     'com.softwinner.TvdFileManager': '<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/>',
     'com.softwinner.miracastReceiver': '<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8 20h8M12 16.5V20M8.5 10.5a5 5 0 0 1 7 0M10.3 12.6a2.3 2.3 0 0 1 3.4 0"/>',
     'com.xuper.netxxus': '<circle cx="12" cy="12" r="9"/><path d="M10 8.3v7.4l6-3.7-6-3.7z"/>'
+  };
+
+  // Color neón de cada app: [hex, 'r,g,b']; las demás usan rojo
+  var NEON = {
+    'com.xuper.netxxus': ['#9b6bff', '155,107,255'],
+    'com.google.android.youtube.tv': ['#ff4d4d', '255,77,77'],
+    'com.android.chrome': ['#3aa6ff', '58,166,255'],
+    'com.android.vending': ['#2ee59d', '46,229,157'],
+    'com.softwinner.TvdFileManager': ['#ffb02e', '255,176,46'],
+    'com.android.gallery3d': ['#ff6bd6', '255,107,214'],
+    'com.softwinner.miracastReceiver': ['#19d3da', '25,211,218'],
+    'com.android.music': ['#ff7a45', '255,122,69']
   };
 
   var PITCH = 190;                     // alto de una fila (px de diseño)
@@ -274,7 +302,8 @@
       html += '<div class="row">';
       ordered.slice(i, i + POR_FILA).forEach(function (a) {
         var ln = ICONOS_MINIMAL && ICONS[a.pkg];
-        html += '<button class="app" data-pkg="' + esc(a.pkg) + '"><div class="tile' + (ln ? ' ln' : '') + '">' +
+        var nc = NEON[a.pkg];
+        html += '<button class="app" data-pkg="' + esc(a.pkg) + '"' + (nc ? ' style="--c:' + nc[0] + ';--g:' + nc[1] + '"' : '') + '><div class="tile' + (ln ? ' ln' : '') + '">' +
           (ln ? '<svg viewBox="0 0 24 24">' + ln + '</svg>'
               : '<img alt="" decoding="async" src="https://icons.local/' + encodeURIComponent(a.pkg) + '">') +
           '</div><div class="name">' + esc(a.label) + '</div></button>';
@@ -332,9 +361,21 @@
     else { if (cur.r > 0) go(cur.r - 1, wantC, true); else settings.focus({ preventScroll: true }); }
   });
 
+  var heroPkg = '', heroIco = $('heroIco'), heroName = $('heroName');
+  function setHero(b) {
+    var pkg = b.dataset.pkg;
+    if (!pkg || pkg === heroPkg) return;
+    heroPkg = pkg;
+    var ln = ICONOS_MINIMAL && ICONS[pkg];
+    heroIco.innerHTML = ln ? '<svg viewBox="0 0 24 24">' + ln + '</svg>'
+      : '<img alt="" src="https://icons.local/' + encodeURIComponent(pkg) + '">';
+    heroName.textContent = b.querySelector('.name').textContent;
+  }
+
   // Foco por cualquier otro medio (clic, etc.): mantener la fila visible
   track.addEventListener('focusin', function (e) {
     var b = e.target;
+    setHero(b);
     for (var r = 0; r < rows.length; r++) {
       var c = rows[r].indexOf(b);
       if (c >= 0) { if (r !== cur.r || c !== cur.c) { cur.r = r; cur.c = c; wantC = c; scrollTo(r); } return; }
