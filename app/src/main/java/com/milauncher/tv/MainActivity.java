@@ -15,7 +15,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 import android.view.KeyEvent;
@@ -40,7 +44,14 @@ import java.util.Set;
 
 public class MainActivity extends Activity {
 
+    // Salida de audio que se fija al encender el box ("" = no tocar el audio)
+    private static final String AUDIO_SALIDA = "AUDIO_HDMI";
+
     private WebView web;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable audioTask = new Runnable() {
+        @Override public void run() { aplicarSalidaAudio(); }
+    };
 
     // Iconos ya convertidos a PNG (se piden uno por uno, solo los que se ven)
     private final LruCache<String, byte[]> iconCache = new LruCache<String, byte[]>(96);
@@ -75,7 +86,36 @@ public class MainActivity extends Activity {
         });
 
         web.addJavascriptInterface(new Bridge(), "Android");
+
+        // El box arranca con AUDIO_CODEC: se pide AUDIO_HDMI al abrir y se reintenta
+        // un par de veces mientras el sistema termina de iniciar.
+        handler.postDelayed(audioTask, 1500);
+        handler.postDelayed(audioTask, 8000);
+        handler.postDelayed(audioTask, 25000);
         web.loadUrl("file:///android_asset/index.html");
+    }
+
+    private void aplicarSalidaAudio() {
+        if (AUDIO_SALIDA.length() == 0) return;
+        try {
+            AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+            String actual = am.getParameters("audio_devices_out_active");
+            if (actual != null && actual.contains(AUDIO_SALIDA)) return;   // ya está bien
+            am.setParameters("audio_devices_out_active=" + AUDIO_SALIDA);
+        } catch (Exception ignored) {
+        }
+        try {   // que el menú de Sonido muestre lo mismo (necesita el permiso de ajustes, si se concedió)
+            if (Settings.System.canWrite(this)) {
+                Settings.System.putString(getContentResolver(), "audio_output_channel", AUDIO_SALIDA);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        handler.removeCallbacks(audioTask);
+        super.onDestroy();
     }
 
     @Override
