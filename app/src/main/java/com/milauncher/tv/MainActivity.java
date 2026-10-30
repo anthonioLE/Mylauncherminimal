@@ -100,8 +100,9 @@ public class MainActivity extends Activity {
         try {
             AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
             String actual = am.getParameters("audio_devices_out_active");
-            if (actual != null && actual.contains(AUDIO_SALIDA)) return;   // ya está bien
-            am.setParameters("audio_devices_out_active=" + AUDIO_SALIDA);
+            if (actual == null || !actual.contains(AUDIO_SALIDA)) {      // solo si no está ya en HDMI
+                am.setParameters("audio_devices_out_active=" + AUDIO_SALIDA);
+            }
         } catch (Exception ignored) {
         }
         try {   // que el menú de Sonido muestre lo mismo (necesita el permiso de ajustes, si se concedió)
